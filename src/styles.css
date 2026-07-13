@@ -1,0 +1,268 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    background:
+      radial-gradient(circle at 12% 10%, rgb(255 196 229 / 0.78) 0 150px, transparent 151px),
+      radial-gradient(circle at 84% 16%, rgb(181 151 241 / 0.78) 0 190px, transparent 191px),
+      radial-gradient(circle at 62% 88%, rgb(141 202 238 / 0.45) 0 180px, transparent 181px),
+      linear-gradient(180deg, #bda5f4 0%, #dfd1ff 42%, #fbf8ff 100%);
+    font-family: "Comic Sans MS", "Arial Rounded MT Bold", "Nunito", ui-rounded, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    letter-spacing: 0;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+}
+
+@layer components {
+  .app-screen {
+    @apply relative mx-auto min-h-[100dvh] max-w-[430px] overflow-hidden bg-[#fffafe]/95 shadow-[0_24px_70px_rgba(68,42,103,0.20)] backdrop-blur;
+  }
+
+  .app-screen::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 16px 18px, rgb(183 144 223 / 0.13) 2px, transparent 3px),
+      radial-gradient(circle at 68px 74px, rgb(240 169 209 / 0.12) 2px, transparent 3px);
+    background-size: 92px 92px;
+    mask-image: linear-gradient(to bottom, black 0%, black 58%, transparent 100%);
+  }
+
+  @media (min-width: 520px) {
+    .app-screen {
+      @apply my-4 rounded-[34px] border border-white/80;
+      min-height: calc(100dvh - 2rem);
+    }
+  }
+
+  .mm-mark {
+    @apply flex h-12 w-12 items-center justify-center rounded-[18px] border-2 border-[#2f2147] bg-[#b790df] text-sm font-black text-white shadow-[0_12px_24px_rgba(120,76,170,0.24)];
+  }
+
+  .bottom-nav {
+    @apply fixed bottom-0 left-1/2 z-40 grid w-full max-w-[430px] -translate-x-1/2 grid-cols-5 items-end border-t border-[#eadcf4] bg-white/95 px-3 pb-4 pt-2 shadow-[0_-16px_36px_rgba(93,61,130,0.10)] backdrop-blur-xl;
+  }
+
+  @media (min-width: 520px) {
+    .bottom-nav {
+      @apply bottom-4 rounded-b-[34px];
+    }
+  }
+
+  .bottom-nav-item {
+    @apply flex min-w-0 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-1 text-[11px] font-medium text-[#5f5368] transition active:scale-95;
+  }
+
+  .bottom-nav-active {
+    @apply text-[#9b68cf];
+  }
+
+  .bottom-nav-add {
+    @apply absolute left-1/2 top-[-18px] h-16 w-16 -translate-x-1/2 rounded-full border-2 border-white bg-[#a678df] text-white shadow-[0_14px_28px_rgba(132,86,191,0.35)];
+  }
+
+  .home-hero {
+    @apply relative overflow-hidden rounded-[30px] bg-[linear-gradient(135deg,#fff7fd_0%,#f5eeff_52%,#fff8fb_100%)] p-5 shadow-[0_18px_36px_rgba(87,54,128,0.13)];
+  }
+
+  .home-hero::after {
+    content: "";
+    position: absolute;
+    inset: auto -18px -38px auto;
+    width: 160px;
+    height: 90px;
+    border: 1px solid #eadcf4;
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgb(248 217 109 / 0.72), rgb(240 169 209 / 0.34));
+    transform: rotate(-18deg);
+    opacity: 0.42;
+  }
+
+  .hero-note {
+    @apply inline-flex items-center gap-2 rounded-full bg-white/90 px-3 py-2 text-xs font-semibold text-[#60417e] shadow-[0_8px_18px_rgba(87,54,128,0.10)];
+  }
+
+  .hero-flower {
+    width: 132px;
+    height: 128px;
+    flex: 0 0 auto;
+    object-fit: contain;
+    transform: rotate(5deg) translate(8px, -12px);
+    filter: drop-shadow(0 12px 18px rgb(92 57 132 / 0.16));
+  }
+
+  .page-head {
+    @apply flex items-center justify-between gap-3;
+  }
+
+  .sticker-board {
+    @apply relative overflow-hidden rounded-[24px] bg-[radial-gradient(circle_at_12px_12px,rgb(200_167_255_/_0.18)_1.5px,transparent_2px)] bg-[length:24px_24px];
+  }
+
+  .inspiration-sticker {
+    @apply absolute max-h-28 max-w-28 object-contain drop-shadow-[0_10px_12px_rgba(92,57,132,0.16)] transition active:scale-95;
+  }
+
+  .inspiration-sticker-1 {
+    @apply left-6 top-7 rotate-[-7deg];
+  }
+
+  .inspiration-sticker-2 {
+    @apply right-8 top-9 rotate-[8deg];
+  }
+
+  .inspiration-sticker-3 {
+    @apply bottom-7 left-14 rotate-[10deg];
+  }
+
+  .inspiration-sticker-4 {
+    @apply bottom-6 right-14 rotate-[-8deg];
+  }
+
+  .inspiration-sticker-5 {
+    @apply left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rotate-[3deg];
+  }
+
+  .week-preview-row {
+    @apply flex items-center gap-2 rounded-2xl bg-[#fff8fb] px-3 py-2;
+  }
+
+  .drawer-panel {
+    @apply rounded-t-[28px] border border-[#eadcf4] bg-white/95 p-4 shadow-[0_-12px_28px_rgba(93,61,130,0.08)] backdrop-blur;
+  }
+
+  .outfit-card {
+    @apply flex overflow-hidden rounded-[24px] bg-white/90 shadow-[0_14px_32px_rgba(93,61,130,0.10)];
+  }
+
+  .mobile-search {
+    @apply h-14 w-full rounded-[24px] border-2 border-[#e5d4f1] bg-white/95 pr-4 text-sm text-ink shadow-[0_10px_26px_rgba(120,76,170,0.08)] outline-none placeholder:text-[#b7a2c6] focus:border-[#bd95e5] focus:ring-4 focus:ring-[#d7c0f3]/45;
+  }
+
+  .mobile-card {
+    @apply rounded-[26px] border-2 border-[#eadcf4] bg-white/90 shadow-[0_14px_32px_rgba(93,61,130,0.10)] backdrop-blur;
+  }
+
+  .stat-card {
+    @apply rounded-[24px] border-2 border-[#eadcf4] bg-white/90 p-4 shadow-[0_12px_28px_rgba(93,61,130,0.09)];
+  }
+
+  .stat-icon {
+    @apply mb-3 flex h-9 w-9 items-center justify-center rounded-2xl text-sm font-black text-[#825ba8];
+  }
+
+  .chip {
+    @apply shrink-0 rounded-full border border-[#eadcf4] bg-white px-4 py-2 text-sm text-[#6f5b80] transition active:scale-95;
+  }
+
+  .chip-active {
+    @apply border-[#2f2147] bg-[#b48add] text-white shadow-[0_8px_18px_rgba(132,86,191,0.22)];
+  }
+
+  .mini-select {
+    @apply min-w-0 rounded-2xl border border-[#eadcf4] bg-white px-2 py-2 text-xs text-[#6f5b80] outline-none;
+  }
+
+  .soft-shell {
+    @apply rounded-[26px] border border-[#eadcf4] bg-white/85 shadow-[0_14px_32px_rgba(93,61,130,0.10)] backdrop-blur;
+  }
+
+  .page-title {
+    @apply text-2xl font-black text-ink;
+  }
+
+  .page-kicker {
+    @apply mt-1 text-sm text-[#806897];
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center gap-2 rounded-full bg-[#a678df] px-4 py-2 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(132,86,191,0.28)] transition hover:-translate-y-0.5 hover:bg-[#9560cd] disabled:cursor-not-allowed disabled:opacity-45;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center gap-2 rounded-full border border-[#eadcf4] bg-white/90 px-4 py-2 text-sm font-semibold text-[#6d5680] shadow-sm transition hover:-translate-y-0.5 hover:bg-paper disabled:cursor-not-allowed disabled:opacity-45;
+  }
+
+  .icon-btn {
+    @apply inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#eadcf4] bg-white/90 text-[#8c65b6] shadow-sm transition hover:-translate-y-0.5 hover:bg-paper;
+  }
+
+  .input {
+    @apply w-full rounded-2xl border border-[#eadcf4] bg-white/90 px-3 py-2 text-sm text-ink outline-none transition placeholder:text-[#a996b7] focus:border-[#bd95e5] focus:ring-4 focus:ring-[#d7c0f3]/45;
+  }
+
+  .field-label {
+    @apply block text-sm font-medium text-[#5f4b76];
+  }
+
+  .field-label .input {
+    @apply mt-2;
+  }
+
+  .tag {
+    @apply rounded-full border border-white/80 bg-paper px-3 py-1.5 text-sm text-[#5f4b76] shadow-sm transition hover:-translate-y-0.5 hover:bg-white;
+  }
+
+  .tag-active {
+    @apply border-lilac/40 bg-lilac text-white hover:bg-lilac;
+  }
+
+  .cute-panel {
+    @apply rounded-[24px] border border-[#eadcf4] bg-white/85 shadow-[0_14px_32px_rgba(93,61,130,0.10)] backdrop-blur;
+  }
+
+  .scrapbook-bg {
+    background:
+      radial-gradient(circle at 18px 18px, rgba(167, 139, 221, 0.24) 2px, transparent 3px),
+      linear-gradient(135deg, rgba(255,255,255,0.92), rgba(238,228,255,0.82));
+    background-size: 34px 34px, auto;
+  }
+
+  .power-pop {
+    @apply border border-[#eadcf4] shadow-[0_12px_24px_rgba(93,61,130,0.10)];
+  }
+
+  .hero-spark {
+    @apply absolute rounded-full border border-[#d9c2ed] bg-white/80 shadow-sticker;
+  }
+
+  .doodle-star,
+  .doodle-heart,
+  .doodle-burst {
+    @apply pointer-events-none absolute opacity-70;
+  }
+
+  .doodle-star::before {
+    content: "☆";
+    text-shadow: 1.5px 1.5px 0 #2f2147;
+    @apply text-3xl font-black text-[#f7d96d];
+  }
+
+  .doodle-heart::before {
+    content: "♡";
+    text-shadow: 1.5px 1.5px 0 #2f2147;
+    @apply text-4xl font-black text-[#c59ae8];
+  }
+
+  .doodle-burst::before {
+    content: "✦";
+    text-shadow: 1.5px 1.5px 0 #2f2147;
+    @apply text-2xl font-black text-[#8bc7e4];
+  }
+}
