@@ -79,12 +79,8 @@
   .studio-tools-divider { height: 22px; width: 1px; flex: 0 0 1px; background: #e4d8ce; }
   .studio-sticker { transform-origin: center; }
   .studio-sticker.is-selected::after { content: ""; position: absolute; inset: -5px; border: 1px dashed rgb(184 103 130 / 0.86); border-radius: 9px; pointer-events: none; }
-  .inspiration-sticker { @apply absolute max-h-28 max-w-28 object-contain drop-shadow-[2px_5px_5px_rgba(74,48,40,0.18)] transition active:scale-95; }
-  .inspiration-sticker-1 { @apply left-6 top-7 rotate-[-7deg]; }
-  .inspiration-sticker-2 { @apply right-8 top-9 rotate-[8deg]; }
-  .inspiration-sticker-3 { @apply bottom-7 left-14 rotate-[10deg]; }
-  .inspiration-sticker-4 { @apply bottom-6 right-14 rotate-[-8deg]; }
-  .inspiration-sticker-5 { @apply left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rotate-[3deg]; }
+  .inspiration-sticker { position: absolute; left: 0; top: 0; width: 112px; height: 112px; object-fit: contain; cursor: grab; touch-action: none; user-select: none; filter: drop-shadow(2px 5px 5px rgb(74 48 40 / 0.18)); will-change: transform; }
+  .inspiration-sticker.is-moving { cursor: grabbing; filter: drop-shadow(3px 9px 8px rgb(74 48 40 / 0.24)); }
   .week-preview-row { @apply flex items-center gap-2 border-b border-[#e1d5c9] px-1 py-3 last:border-0; }
 
   .drawer-panel { @apply rounded-t-[5px] border border-[#d8c9bc] bg-[#faf6f0] p-4 shadow-[0_-8px_22px_rgba(72,45,35,0.10)]; }

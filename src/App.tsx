@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "./components/AppShell";
 import { EntrancePage } from "./components/EntrancePage";
 import { FeedbackToast } from "./components/FeedbackToast";
+import { ProfileSetupModal } from "./components/ProfileSetupModal";
 import { backgroundRemovalService } from "./services/backgroundRemoval";
 import { useWardrobeStore } from "./hooks/useWardrobeStore";
 import { useLocalStorage } from "./hooks/useLocalStorage";
@@ -9,14 +10,18 @@ import { AddClothingPage } from "./pages/AddClothingPage";
 import { HomePage } from "./pages/HomePage";
 import { OutfitsPage } from "./pages/OutfitsPage";
 import { PlannerPage } from "./pages/PlannerPage";
+import { ProfilePage } from "./pages/ProfilePage";
 import { StudioPage } from "./pages/StudioPage";
 import { WardrobePage } from "./pages/WardrobePage";
-import type { ClothingItem, HomeColorMap, HomeLocation, Outfit, OutfitScene, Page, PlannerDay } from "./types";
+import type { ClothingItem, HomeColorMap, HomeLocation, Outfit, OutfitScene, Page, PlannerDay, UserProfile } from "./types";
+
+const emptyProfile: UserProfile = { name: "", gymDays: [], gymTime: "", setupComplete: false };
 
 export default function App() {
   const { clothes, setClothes, outfits, setOutfits, weeklyPlan, setWeeklyPlan, allTags, markUsed } = useWardrobeStore();
   const [homeLocations, setHomeLocations] = useLocalStorage<HomeLocation[]>("wardrobe.homeLocations.v1", []);
   const [homeColors, setHomeColors] = useLocalStorage<HomeColorMap>("wardrobe.homeColors.v1", {});
+  const [profile, setProfile] = useLocalStorage<UserProfile>("wardrobe.profile.v1", emptyProfile);
   const [page, setPage] = useState<Page>("home");
   const [entranceState, setEntranceState] = useState<"entrance" | "transitioning" | "complete">("entrance");
   const [editingClothing, setEditingClothing] = useState<ClothingItem | null>(null);
@@ -78,6 +83,11 @@ export default function App() {
     notify(`已添加「${location}」`);
   };
 
+  const saveProfile = (nextProfile: UserProfile) => {
+    setProfile(nextProfile);
+    notify("你的衣橱设置已保存");
+  };
+
   const reprocess = async (item: ClothingItem) => {
     setClothes((current) => current.map((entry) => entry.id === item.id ? { ...entry, imageStatus: "processing", updatedAt: new Date().toISOString() } : entry));
     try {
@@ -133,9 +143,9 @@ export default function App() {
   return (
     <>
     <div className={`main-stage ${entranceState === "transitioning" ? "is-revealing" : ""} ${entranceState === "complete" ? "is-ready" : ""}`}>
-    <AppShell page={page} onNavigate={navigate}>
+    <AppShell page={page} ownerName={profile.name} onNavigate={navigate}>
       {page === "home" && (
-        <HomePage clothes={clothes} outfits={outfits} weeklyPlan={weeklyPlan} onNavigate={navigate} />
+        <HomePage clothes={clothes} outfits={outfits} weeklyPlan={weeklyPlan} profile={profile} onNavigate={navigate} />
       )}
       {page === "wardrobe" && (
         <WardrobePage
@@ -180,7 +190,8 @@ export default function App() {
           onRename={renameOutfit}
         />
       )}
-      {page === "planner" && <PlannerPage outfits={outfits} weeklyPlan={weeklyPlan} onAssign={assignDay} />}
+      {page === "planner" && <PlannerPage outfits={outfits} weeklyPlan={weeklyPlan} profile={profile} onAssign={assignDay} />}
+      {page === "profile" && <ProfilePage profile={profile} onSave={saveProfile} />}
     </AppShell>
     </div>
     {entranceState !== "complete" && (
@@ -189,6 +200,7 @@ export default function App() {
         onCompleteEnter={() => setEntranceState("complete")}
       />
     )}
+    {entranceState === "complete" && !profile.setupComplete && <ProfileSetupModal profile={profile} onSave={saveProfile} />}
     {notice && <FeedbackToast message={notice.message} kind={notice.kind} />}
     </>
   );

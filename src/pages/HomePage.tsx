@@ -1,18 +1,56 @@
 import { ArrowUpRight, CalendarDays, Heart, Search, Shirt, Sparkles } from "lucide-react";
+import type { PointerEvent } from "react";
+import { useRef, useState } from "react";
 import { DAY_LABELS, PLANNER_DAYS } from "../constants/wardrobe";
-import type { ClothingItem, Outfit, Page, WeeklyPlan } from "../types";
+import { useLocalStorage } from "../hooks/useLocalStorage";
+import type { ClothingItem, Outfit, Page, UserProfile, WeeklyPlan } from "../types";
 
 type Props = {
   clothes: ClothingItem[];
   outfits: Outfit[];
   weeklyPlan: WeeklyPlan;
+  profile: UserProfile;
   onNavigate: (page: Page) => void;
 };
 
-export function HomePage({ clothes, outfits, weeklyPlan, onNavigate }: Props) {
+export function HomePage({ clothes, outfits, weeklyPlan, profile, onNavigate }: Props) {
   const inspirationItems = clothes.slice(0, 5);
   const favoriteCount = clothes.filter((item) => item.favorite).length;
   const plannedCount = Object.values(weeklyPlan).filter(Boolean).length;
+  const [storedPositions, setStoredPositions] = useLocalStorage<Record<string, { x: number; y: number }>>("wardrobe.inspirationPositions.v1", {});
+  const [positions, setPositions] = useState(storedPositions);
+  const positionsRef = useRef(positions);
+  const [dragging, setDragging] = useState<{ id: string; offsetX: number; offsetY: number } | null>(null);
+  const defaultPositions = [
+    { x: 18, y: 18 }, { x: 172, y: 26 }, { x: 92, y: 142 }, { x: 210, y: 158 }, { x: 28, y: 214 }
+  ];
+
+  const positionFor = (id: string, index: number) => positions[id] || defaultPositions[index] || { x: 60, y: 60 };
+
+  const beginMove = (event: PointerEvent<HTMLImageElement>, id: string, index: number) => {
+    const board = event.currentTarget.parentElement;
+    if (!board) return;
+    const rect = board.getBoundingClientRect();
+    const position = positionFor(id, index);
+    event.currentTarget.setPointerCapture(event.pointerId);
+    setDragging({ id, offsetX: event.clientX - rect.left - position.x, offsetY: event.clientY - rect.top - position.y });
+  };
+
+  const move = (event: PointerEvent<HTMLDivElement>) => {
+    if (!dragging) return;
+    const rect = event.currentTarget.getBoundingClientRect();
+    const x = Math.max(0, Math.min(rect.width - 112, event.clientX - rect.left - dragging.offsetX));
+    const y = Math.max(0, Math.min(rect.height - 112, event.clientY - rect.top - dragging.offsetY));
+    const next = { ...positionsRef.current, [dragging.id]: { x, y } };
+    positionsRef.current = next;
+    setPositions(next);
+  };
+
+  const endMove = () => {
+    if (!dragging) return;
+    setStoredPositions(positionsRef.current);
+    setDragging(null);
+  };
 
   return (
     <div className="space-y-4">
@@ -20,7 +58,7 @@ export function HomePage({ clothes, outfits, weeklyPlan, onNavigate }: Props) {
         <div className="home-hero-photo" />
         <div className="home-hero-copy">
           <p className="home-stamp">THE CLOSET DIARY / 04:26 PM</p>
-          <h1>Hi, Marina</h1>
+          <h1>Hi, {profile.name || "there"}</h1>
           <p>你的衣橱，正安静地等你决定今天的样子。</p>
           <button className="home-link" onClick={() => onNavigate("wardrobe")}>看看我的衣服 <ArrowUpRight size={16} /></button>
         </div>
@@ -63,13 +101,15 @@ export function HomePage({ clothes, outfits, weeklyPlan, onNavigate }: Props) {
           </div>
           <button className="btn-secondary px-3 py-1.5" onClick={() => onNavigate("studio")}>去搭配</button>
         </div>
-        <div className="sticker-board min-h-56">
+        <div className="sticker-board min-h-[320px]" onPointerMove={move} onPointerUp={endMove} onPointerCancel={endMove}>
           {inspirationItems.length ? inspirationItems.map((item, index) => (
             <img
               key={item.id}
               src={item.cutoutImage || item.originalImage}
               alt={item.name}
-              className={`inspiration-sticker inspiration-sticker-${index + 1}`}
+              className={`inspiration-sticker ${dragging?.id === item.id ? "is-moving" : ""}`}
+              style={{ transform: `translate3d(${positionFor(item.id, index).x}px, ${positionFor(item.id, index).y}px, 0) rotate(${[-7, 8, 10, -8, 3][index] || 0}deg)` }}
+              onPointerDown={(event) => beginMove(event, item.id, index)}
             />
           )) : (
             <div className="flex h-52 items-center justify-center text-center text-sm leading-6 text-[#9a83aa]">
@@ -89,7 +129,7 @@ export function HomePage({ clothes, outfits, weeklyPlan, onNavigate }: Props) {
             <div key={day} className="week-preview-row">
               <span className="w-12 text-xs font-black text-[#8e73a3]">{DAY_LABELS[day]}</span>
               <span className="flex-1 text-sm text-[#6b5778]">{weeklyPlan[day] ? outfits.find((item) => item.id === weeklyPlan[day])?.name || "已安排" : "还没有安排"}</span>
-              {(day === "Monday" || day === "Wednesday") && <span className="rounded-full bg-[#f4edff] px-2 py-1 text-[11px] text-[#9b68cf]">今晚健身</span>}
+              {profile.gymDays.includes(day) && <span className="rounded-full bg-[#f4edff] px-2 py-1 text-[11px] text-[#9b68cf]">{profile.gymTime ? `${profile.gymTime} 健身` : "今天健身"}</span>}
             </div>
           ))}
         </div>

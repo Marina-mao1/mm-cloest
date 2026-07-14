@@ -75,4 +75,11 @@ export type PlannerDay =
 
 export type WeeklyPlan = Record<PlannerDay, string | undefined>;
 
-export type Page = "home" | "wardrobe" | "add" | "studio" | "outfits" | "planner";
+export type UserProfile = {
+  name: string;
+  gymDays: PlannerDay[];
+  gymTime: string;
+  setupComplete: boolean;
+};
+
+export type Page = "home" | "wardrobe" | "add" | "studio" | "outfits" | "planner" | "profile";
