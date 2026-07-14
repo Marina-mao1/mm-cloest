@@ -18,19 +18,14 @@ type Props = {
 
 export function AppShell({ page, onNavigate, children }: Props) {
   return (
-    <div className="min-h-[100dvh] bg-transparent text-ink">
-      <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
-        <div className="absolute left-[-120px] top-[-60px] h-80 w-80 rounded-full bg-[#d5c3ff] blur-3xl" />
-        <div className="absolute right-[-90px] top-32 h-72 w-72 rounded-full bg-[#f4c6df] blur-3xl" />
-        <div className="absolute bottom-[-120px] left-1/4 h-96 w-96 rounded-full bg-[#bda4f4] blur-3xl" />
-      </div>
+    <div className="min-h-[100dvh] bg-[#efe7dc] text-ink">
       <div className="app-screen">
         <header className="px-5 pb-3 pt-5">
           <button className="flex items-center gap-3 text-left" onClick={() => onNavigate("home")}>
-            <span className="mm-mark">MM</span>
+            <span className="mm-mark">M</span>
             <span>
-              <span className="block text-[26px] font-black leading-tight tracking-[-0.02em]">MM Closet</span>
-              <span className="block text-sm text-[#83679d]">你的衣橱管理者</span>
+              <span className="block text-[25px] font-semibold leading-tight">MM Closet</span>
+              <span className="block text-[10px] tracking-[0.16em] text-[#8d6c69]">MARINA MAO'S WARDROBE</span>
             </span>
           </button>
         </header>

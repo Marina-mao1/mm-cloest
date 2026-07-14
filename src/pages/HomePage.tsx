@@ -1,7 +1,6 @@
-import { CalendarDays, Heart, Search, Shirt, Sparkles } from "lucide-react";
+import { ArrowUpRight, CalendarDays, Heart, Search, Shirt, Sparkles } from "lucide-react";
 import { DAY_LABELS, PLANNER_DAYS } from "../constants/wardrobe";
 import type { ClothingItem, Outfit, Page, WeeklyPlan } from "../types";
-import purpleClematis from "../assets/purple-clematis-cutout.png";
 
 type Props = {
   clothes: ClothingItem[];
@@ -18,16 +17,12 @@ export function HomePage({ clothes, outfits, weeklyPlan, onNavigate }: Props) {
   return (
     <div className="space-y-4">
       <section className="home-hero">
-        <div className="doodle-star left-5 top-5" />
-        <div className="doodle-heart right-7 top-24" />
-        <div className="doodle-burst bottom-6 right-14" />
-        <div className="relative flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <p className="text-sm font-semibold text-[#9a75bb]">Hi, Marina</p>
-            <h1 className="mt-1 text-[32px] font-black leading-tight tracking-[-0.04em]">今天也要闪闪发光</h1>
-            <p className="mt-2 max-w-[15rem] text-sm leading-6 text-[#755f88]">把明天穿什么，变成一件轻松的小事。</p>
-          </div>
-          <img className="hero-flower" src={purpleClematis} alt="" aria-hidden="true" />
+        <div className="home-hero-photo" />
+        <div className="home-hero-copy">
+          <p className="home-stamp">THE CLOSET DIARY / 04:26 PM</p>
+          <h1>Hi, Marina</h1>
+          <p>你的衣橱，正安静地等你决定今天的样子。</p>
+          <button className="home-link" onClick={() => onNavigate("wardrobe")}>看看我的衣服 <ArrowUpRight size={16} /></button>
         </div>
       </section>
 
@@ -62,8 +57,9 @@ export function HomePage({ clothes, outfits, weeklyPlan, onNavigate }: Props) {
       <section className="mobile-card overflow-hidden p-4">
         <div className="mb-3 flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-black">今日灵感</h2>
-            <p className="mt-1 text-xs text-[#8b719d]">今天还没有搭配灵感，去创造一套 Look 吧～</p>
+            <p className="section-kicker">TODAY'S LITTLE LOOK</p>
+            <h2 className="text-2xl font-semibold">今日灵感</h2>
+            <p className="mt-1 text-xs text-[#8b719d]">从衣橱里挑几件，拼出今天的心情。</p>
           </div>
           <button className="btn-secondary px-3 py-1.5" onClick={() => onNavigate("studio")}>去搭配</button>
         </div>

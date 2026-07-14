@@ -1,5 +1,6 @@
 import { Edit3, Heart, RotateCcw, Trash2 } from "lucide-react";
-import type { ClothingItem } from "../types";
+import type { CSSProperties } from "react";
+import type { ClothingItem, HomeColorMap, HomeLocation } from "../types";
 
 type Props = {
   item: ClothingItem;
@@ -8,18 +9,24 @@ type Props = {
   onDelete?: (item: ClothingItem) => void;
   onToggleFavorite?: (item: ClothingItem) => void;
   onReprocess?: (item: ClothingItem) => void;
+  onChangeHomeLocation?: (item: ClothingItem) => void;
+  homeColors?: HomeColorMap;
+  homeLocations?: string[];
   onDragStart?: (item: ClothingItem) => void;
 };
 
-export function ClothingCard({ item, compact, onEdit, onDelete, onToggleFavorite, onReprocess, onDragStart }: Props) {
+export function ClothingCard({ item, compact, onEdit, onDelete, onToggleFavorite, onReprocess, onChangeHomeLocation, homeColors, homeLocations = [], onDragStart }: Props) {
   const image = item.cutoutImage || item.originalImage;
+  const currentLocation = item.homeLocation;
+  const currentIndex = currentLocation ? homeLocations.indexOf(currentLocation) : -1;
+  const nextLocation = homeLocations.length ? homeLocations[(currentIndex + 1) % homeLocations.length] : "添加房子";
   return (
     <article
-      className="group rounded-[20px] border border-[#eadcf4] bg-white/85 p-2 shadow-[0_10px_24px_rgba(93,61,130,0.08)] backdrop-blur transition hover:-translate-y-1 hover:shadow-soft"
+      className="clothing-paper-card group"
       draggable={Boolean(onDragStart)}
       onDragStart={() => onDragStart?.(item)}
     >
-      <div className="relative aspect-square overflow-hidden rounded-2xl bg-[#faf6fb]">
+      <div className="relative aspect-square overflow-hidden rounded-[3px] bg-[#f3eee5]">
         <img src={image} alt={item.name} className="h-full w-full object-contain p-2" />
         <button
           title="收藏"
@@ -39,7 +46,7 @@ export function ClothingCard({ item, compact, onEdit, onDelete, onToggleFavorite
         <div className="flex items-start justify-between gap-2">
           <div>
             <h3 className="line-clamp-1 text-xs font-semibold">{item.name}</h3>
-            {!compact && <p className="mt-0.5 text-[10px] text-[#8a7488]">{item.color || item.mainCategory}</p>}
+            {!compact && <p className="mt-0.5 text-[10px] text-[#8a7488]">{item.homeLocation || "未标注"} · {item.color || item.mainCategory}</p>}
           </div>
         </div>
         {(onEdit || onDelete || onReprocess) && (
@@ -47,6 +54,7 @@ export function ClothingCard({ item, compact, onEdit, onDelete, onToggleFavorite
             {onEdit && <button title="编辑" className="icon-btn" onClick={() => onEdit(item)}><Edit3 size={16} /></button>}
             {onReprocess && <button title="重新抠图" className="icon-btn" onClick={() => onReprocess(item)}><RotateCcw size={16} /></button>}
             {onDelete && <button title="删除" className="icon-btn text-clay" onClick={() => onDelete(item)}><Trash2 size={16} /></button>}
+            {onChangeHomeLocation && <button title={homeLocations.length ? `切换到${nextLocation}` : "先添加房子"} className="home-location-dot" style={{ "--home-dot": currentLocation ? homeColors?.[currentLocation] || "#b9ada7" : "#b9ada7" } as CSSProperties} onClick={() => onChangeHomeLocation(item)}><span className="sr-only">切换到{nextLocation}</span></button>}
           </div>
         )}
       </div>

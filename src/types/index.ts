@@ -6,9 +6,15 @@ export type MainCategory =
   | "鞋"
   | "帽子"
   | "包"
+  | "腰带"
+  | "睡衣"
   | "配饰";
 
 export type ImageStatus = "original" | "processing" | "cutout" | "failed";
+
+export type HomeLocation = string;
+
+export type HomeColorMap = Record<HomeLocation, string>;
 
 export type ClothingItem = {
   id: string;
@@ -16,6 +22,7 @@ export type ClothingItem = {
   mainCategory: MainCategory;
   subCategory: string;
   color: string;
+  homeLocation?: HomeLocation;
   tags: string[];
   favorite: boolean;
   note: string;

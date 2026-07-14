@@ -1,8 +1,8 @@
-import { Filter, Search } from "lucide-react";
+import { ChevronDown, Filter, Plus, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ClothingCard } from "../components/ClothingCard";
 import { CATEGORIES, MAIN_CATEGORIES } from "../constants/wardrobe";
-import type { ClothingItem, MainCategory } from "../types";
+import type { ClothingItem, HomeColorMap, HomeLocation, MainCategory } from "../types";
 
 type Props = {
   clothes: ClothingItem[];
@@ -11,14 +11,23 @@ type Props = {
   onDelete: (item: ClothingItem) => void;
   onToggleFavorite: (item: ClothingItem) => void;
   onReprocess: (item: ClothingItem) => void;
+  onChangeHomeLocation: (item: ClothingItem) => void;
+  homeColors: HomeColorMap;
+  onHomeColorsChange: (colors: HomeColorMap) => void;
+  homeLocations: string[];
+  onAddHomeLocation: (name: string, color: string) => void;
 };
 
-export function WardrobePage({ clothes, allTags, onEdit, onDelete, onToggleFavorite, onReprocess }: Props) {
+export function WardrobePage({ clothes, allTags, onEdit, onDelete, onToggleFavorite, onReprocess, onChangeHomeLocation, homeColors, onHomeColorsChange, homeLocations, onAddHomeLocation }: Props) {
   const [query, setQuery] = useState("");
   const [main, setMain] = useState<MainCategory | "">("");
   const [sub, setSub] = useState("");
   const [color, setColor] = useState("");
   const [tag, setTag] = useState("");
+  const [homeLocation, setHomeLocation] = useState<HomeLocation | "">("");
+  const [newHomeName, setNewHomeName] = useState("");
+  const [newHomeColor, setNewHomeColor] = useState("#c85c72");
+  const [homeMenuOpen, setHomeMenuOpen] = useState(false);
   const [favoriteOnly, setFavoriteOnly] = useState(false);
   const colors = useMemo(() => Array.from(new Set(clothes.map((item) => item.color).filter(Boolean))).sort(), [clothes]);
   const filtered = clothes.filter((item) =>
@@ -27,8 +36,16 @@ export function WardrobePage({ clothes, allTags, onEdit, onDelete, onToggleFavor
     (!sub || item.subCategory === sub) &&
     (!color || item.color === color) &&
     (!tag || item.tags.includes(tag)) &&
+    (!homeLocation || item.homeLocation === homeLocation) &&
     (!favoriteOnly || item.favorite)
   );
+
+  const addHome = () => {
+    if (!newHomeName.trim()) return;
+    onAddHomeLocation(newHomeName, newHomeColor);
+    setNewHomeName("");
+    setHomeMenuOpen(false);
+  };
 
   return (
     <div className="space-y-4">
@@ -55,7 +72,7 @@ export function WardrobePage({ clothes, allTags, onEdit, onDelete, onToggleFavor
       </div>
 
       <section className="mobile-card p-3">
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           <select className="mini-select" value={sub} onChange={(event) => setSub(event.target.value)}>
             <option value="">子类</option>
             {(main ? CATEGORIES[main] : Object.values(CATEGORIES).flat()).map((item) => <option key={item}>{item}</option>)}
@@ -68,12 +85,38 @@ export function WardrobePage({ clothes, allTags, onEdit, onDelete, onToggleFavor
             <option value="">标签</option>
             {allTags.map((item) => <option key={item}>{item}</option>)}
           </select>
+          <div className="relative">
+            <button className="mini-select home-filter-trigger" type="button" onClick={() => setHomeMenuOpen((current) => !current)}>
+              <span>{homeLocation || "所有房子"}</span><ChevronDown size={15} />
+            </button>
+            {homeMenuOpen && (
+              <div className="home-filter-menu">
+                <button className={!homeLocation ? "is-selected" : ""} type="button" onClick={() => { setHomeLocation(""); setHomeMenuOpen(false); }}>所有房子</button>
+                {homeLocations.map((location) => (
+                  <div className="home-filter-option" key={location}>
+                    <button className={homeLocation === location ? "is-selected" : ""} type="button" onClick={() => { setHomeLocation(location); setHomeMenuOpen(false); }}>
+                      <i style={{ backgroundColor: homeColors[location] || "#b9ada7" }} />{location}
+                    </button>
+                    <label title={`选择${location}的标记颜色`}>
+                      <input type="color" value={homeColors[location] || "#b9ada7"} onChange={(event) => onHomeColorsChange({ ...homeColors, [location]: event.target.value })} />
+                      <i style={{ backgroundColor: homeColors[location] || "#b9ada7" }} />
+                    </label>
+                  </div>
+                ))}
+                <div className="home-filter-add">
+                  <input value={newHomeName} onChange={(event) => setNewHomeName(event.target.value)} onKeyDown={(event) => event.key === "Enter" && (event.preventDefault(), addHome())} placeholder="添加房子" />
+                  <label title="选择这个房子的颜色"><input type="color" value={newHomeColor} onChange={(event) => setNewHomeColor(event.target.value)} /><i style={{ backgroundColor: newHomeColor }} /></label>
+                  <button type="button" title="添加房子" onClick={addHome}><Plus size={16} /></button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
       {filtered.length ? (
         <div className="grid grid-cols-2 gap-3">
-          {filtered.map((item) => <ClothingCard key={item.id} item={item} onEdit={onEdit} onDelete={onDelete} onToggleFavorite={onToggleFavorite} onReprocess={onReprocess} />)}
+          {filtered.map((item) => <ClothingCard key={item.id} item={item} onEdit={onEdit} onDelete={onDelete} onToggleFavorite={onToggleFavorite} onReprocess={onReprocess} onChangeHomeLocation={onChangeHomeLocation} homeColors={homeColors} homeLocations={homeLocations} />)}
         </div>
       ) : (
         <div className="mobile-card p-10 text-center text-[#8a7488]">这里还空空的，去添加第一件衣服吧～</div>

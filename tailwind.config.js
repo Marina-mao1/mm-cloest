@@ -4,16 +4,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        milk: "#f0e7ff",
-        paper: "#eee4ff",
-        wood: "#b69bdf",
-        ink: "#2f2147",
-        moss: "#8aa394",
-        clay: "#d879b0",
-        lilac: "#a78bdd",
-        blush: "#f0a9d1",
-        butter: "#f7d96d",
-        skywash: "#9dd7ef"
+        milk: "#f8f3eb",
+        paper: "#f3e7df",
+        wood: "#9a6e56",
+        ink: "#2d221f",
+        moss: "#7b8973",
+        clay: "#bd5366",
+        lilac: "#bd8caa",
+        blush: "#e8b5b8",
+        butter: "#e8c982",
+        skywash: "#b8c7c4"
       },
       boxShadow: {
         soft: "0 20px 56px rgba(58, 33, 95, 0.22)",

@@ -1,17 +1,21 @@
-import { Camera, ImagePlus, RefreshCw, X } from "lucide-react";
+import { Camera, ImagePlus, Scissors, Clipboard, RefreshCw, RotateCcw, RotateCw, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { fileToDataUrl, resizeDataUrl } from "../utils/image";
+import { dataUrlHasTransparency, fileToDataUrl, resizeDataUrl } from "../utils/image";
 
 type Props = {
   image?: string;
   cutout?: string;
   status?: string;
   onImage: (dataUrl: string) => void;
+  onCutoutImage: (dataUrl: string) => void;
+  onRotate: (degrees: 90 | -90) => Promise<void>;
   onReprocess: () => void;
 };
 
-export function ImagePicker({ image, cutout, status, onImage, onReprocess }: Props) {
+export function ImagePicker({ image, cutout, status, onImage, onCutoutImage, onRotate, onReprocess }: Props) {
   const [cameraOpen, setCameraOpen] = useState(false);
+  const [pasteMessage, setPasteMessage] = useState("");
+  const [rotating, setRotating] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
@@ -29,7 +33,36 @@ export function ImagePicker({ image, cutout, status, onImage, onReprocess }: Pro
 
   const pickFile = async (file?: File) => {
     if (!file) return;
-    onImage(await resizeDataUrl(await fileToDataUrl(file)));
+    const dataUrl = await resizeDataUrl(await fileToDataUrl(file));
+    if (await dataUrlHasTransparency(dataUrl)) {
+      onCutoutImage(dataUrl);
+      return;
+    }
+    onImage(dataUrl);
+  };
+
+  const pickCutoutFile = async (file?: File) => {
+    if (!file) return;
+    onCutoutImage(await resizeDataUrl(await fileToDataUrl(file)));
+  };
+
+  const pasteCutout = async () => {
+    setPasteMessage("");
+    try {
+      const items = await navigator.clipboard?.read?.();
+      const imageItem = items?.find((item) => item.types.some((type) => type.startsWith("image/")));
+      const imageType = imageItem?.types.find((type) => type.startsWith("image/"));
+      if (!imageItem || !imageType) {
+        setPasteMessage("剪贴板里还没有图片。可以先在照片里长按衣服主体，点复制。");
+        return;
+      }
+      const blob = await imageItem.getType(imageType);
+      const dataUrl = await resizeDataUrl(await fileToDataUrl(new File([blob], "apple-cutout.png", { type: blob.type || "image/png" })));
+      onCutoutImage(dataUrl);
+      setPasteMessage("已粘贴苹果抠图。");
+    } catch {
+      setPasteMessage("当前浏览器不允许直接读取剪贴板，可以用“上传苹果抠图 PNG”。");
+    }
   };
 
   const capture = async () => {
@@ -41,6 +74,16 @@ export function ImagePicker({ image, cutout, status, onImage, onReprocess }: Pro
     canvas.getContext("2d")?.drawImage(video, 0, 0);
     onImage(await resizeDataUrl(canvas.toDataURL("image/jpeg", 0.9)));
     setCameraOpen(false);
+  };
+
+  const rotate = async (degrees: 90 | -90) => {
+    if (!image || rotating) return;
+    setRotating(true);
+    try {
+      await onRotate(degrees);
+    } finally {
+      setRotating(false);
+    }
   };
 
   return (
@@ -59,9 +102,19 @@ export function ImagePicker({ image, cutout, status, onImage, onReprocess }: Pro
           上传图片
           <input className="hidden" type="file" accept="image/*" onChange={(event) => pickFile(event.target.files?.[0])} />
         </label>
+        <label className="btn-secondary cursor-pointer">
+          <Scissors size={17} />
+          上传苹果抠图 PNG
+          <input className="hidden" type="file" accept="image/png,image/*" onChange={(event) => pickCutoutFile(event.target.files?.[0])} />
+        </label>
+        <button className="btn-secondary" onClick={pasteCutout} type="button"><Clipboard size={17} />粘贴抠图</button>
         <button className="btn-secondary" onClick={() => setCameraOpen(true)} type="button"><Camera size={17} />拍照</button>
+        <button className="btn-secondary" onClick={() => void rotate(-90)} type="button" disabled={!image || status === "processing" || rotating}><RotateCcw size={17} />向左转</button>
+        <button className="btn-secondary" onClick={() => void rotate(90)} type="button" disabled={!image || status === "processing" || rotating}><RotateCw size={17} />向右转</button>
         <button className="btn-secondary" onClick={onReprocess} type="button" disabled={!image || status === "processing"}><RefreshCw size={17} />重新抠图</button>
       </div>
+      {image && <p className="mt-3 text-xs leading-5 text-[#927d74]">方向不对时可以旋转，原图和透明抠图会一起调整。</p>}
+      {pasteMessage && <p className="mt-3 rounded-2xl bg-white/70 px-3 py-2 text-sm text-[#8a7488]">{pasteMessage}</p>}
       {cameraOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4">
           <div className="w-full max-w-2xl rounded-[28px] bg-milk p-4 shadow-soft">
