@@ -111,6 +111,8 @@
   .home-location-dot { display: grid; width: 36px; height: 36px; flex: 0 0 36px; place-items: center; margin-left: 1px; padding: 0; border: 1px solid #cbbcaf; border-radius: 50%; background: #fffdf8; box-shadow: 0 1px 2px rgb(73 43 36 / 0.12); cursor: pointer; transition: transform 160ms ease, box-shadow 160ms ease; }
   .home-location-dot::after { content: ""; width: 14px; height: 14px; border-radius: 50%; background: var(--home-dot, #b9ada7); box-shadow: inset 0 1px 1px rgb(255 255 255 / 0.35); }
   .home-location-dot:active { transform: scale(0.86); box-shadow: 0 0 0 2px #d9b8c1; }
+  .batch-picker { margin-top: 12px; border: 1px solid #e4cfd1; border-radius: 4px; background: linear-gradient(135deg, #fff9f6, #f9edf1); padding: 15px; box-shadow: 0 8px 16px rgb(104 60 70 / 0.08); }
+  .batch-end { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 4px; border: 0; background: transparent; color: #9a6973; font-size: 12px; text-decoration: underline; text-underline-offset: 3px; }
   .soft-shell, .cute-panel { @apply rounded-[4px] border border-[#ddcfc3] bg-[#fffdf8] shadow-[0_8px_16px_rgba(74,48,40,0.08)]; }
   .scrapbook-bg { background: #f5efe5; }
   .power-pop { @apply border border-[#ddcfc3] shadow-[0_6px_13px_rgba(74,48,40,0.07)]; }
