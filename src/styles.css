@@ -96,7 +96,7 @@
   .home-filter-menu { position: absolute; right: 0; top: calc(100% + 6px); z-index: 35; width: min(260px, calc(100vw - 48px)); border: 1px solid #d8c9bc; border-radius: 12px; background: #fffdf8; padding: 6px; box-shadow: 0 14px 28px rgb(73 43 36 / 0.18); }
   .home-filter-menu > button, .home-filter-option > button { display: flex; width: 100%; align-items: center; gap: 8px; border: 0; border-radius: 8px; background: transparent; padding: 9px 10px; color: #654f49; font-size: 12px; text-align: left; }
   .home-filter-menu > button.is-selected, .home-filter-option > button.is-selected { background: #f3e3e6; color: #9b455a; }
-  .home-filter-option { display: flex; align-items: center; gap: 3px; }
+  .home-filter-option { display: flex; align-items: center; gap: 2px; }
   .home-filter-option > button { flex: 1; }
   .home-filter-option i, .home-filter-option label i, .home-filter-add label i { display: inline-block; width: 15px; height: 15px; flex: 0 0 15px; border: 1px solid #fffdf8; border-radius: 50%; box-shadow: 0 0 0 1px #cdbdb1; }
   .home-filter-option label, .home-filter-add label { display: grid; height: 30px; width: 30px; place-items: center; cursor: pointer; }
@@ -104,6 +104,10 @@
   .home-filter-add { display: flex; align-items: center; gap: 6px; margin-top: 5px; border-top: 1px solid #eadfd5; padding: 8px 3px 2px; }
   .home-filter-add > input { min-width: 0; flex: 1; border: 1px solid #d6c6b9; border-radius: 7px; background: #fffdf8; padding: 7px 8px; color: #5f4b44; font-size: 12px; outline: none; }
   .home-filter-add > button { display: grid; height: 30px; width: 30px; place-items: center; border: 0; border-radius: 50%; background: #c85c72; color: white; }
+  .home-edit-input { min-width: 0; flex: 1; border: 1px solid #d6c6b9; border-radius: 7px; background: #fffdf8; padding: 7px 8px; color: #5f4b44; font-size: 12px; outline: none; }
+  .home-action { display: grid; height: 28px; width: 28px; flex: 0 0 28px; place-items: center; border: 0; border-radius: 50%; background: transparent; color: #8f7170; cursor: pointer; }
+  .home-action:hover { background: #f3e3e6; color: #9b455a; }
+  .home-delete:hover { color: #c85c72; }
   .home-location-dot { display: grid; width: 36px; height: 36px; flex: 0 0 36px; place-items: center; margin-left: 1px; padding: 0; border: 1px solid #cbbcaf; border-radius: 50%; background: #fffdf8; box-shadow: 0 1px 2px rgb(73 43 36 / 0.12); cursor: pointer; transition: transform 160ms ease, box-shadow 160ms ease; }
   .home-location-dot::after { content: ""; width: 14px; height: 14px; border-radius: 50%; background: var(--home-dot, #b9ada7); box-shadow: inset 0 1px 1px rgb(255 255 255 / 0.35); }
   .home-location-dot:active { transform: scale(0.86); box-shadow: 0 0 0 2px #d9b8c1; }

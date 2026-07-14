@@ -6,8 +6,8 @@ type Props = {
   image?: string;
   cutout?: string;
   status?: string;
-  onImage: (dataUrl: string) => void;
-  onCutoutImage: (dataUrl: string) => void;
+  onImage: (dataUrl: string, fileName?: string) => void;
+  onCutoutImage: (dataUrl: string, fileName?: string) => void;
   onRotate: (degrees: 90 | -90) => Promise<void>;
   onReprocess: () => void;
 };
@@ -35,15 +35,15 @@ export function ImagePicker({ image, cutout, status, onImage, onCutoutImage, onR
     if (!file) return;
     const dataUrl = await resizeDataUrl(await fileToDataUrl(file));
     if (await dataUrlHasTransparency(dataUrl)) {
-      onCutoutImage(dataUrl);
+      onCutoutImage(dataUrl, file.name);
       return;
     }
-    onImage(dataUrl);
+    onImage(dataUrl, file.name);
   };
 
   const pickCutoutFile = async (file?: File) => {
     if (!file) return;
-    onCutoutImage(await resizeDataUrl(await fileToDataUrl(file)));
+    onCutoutImage(await resizeDataUrl(await fileToDataUrl(file)), file.name);
   };
 
   const pasteCutout = async () => {
@@ -58,7 +58,7 @@ export function ImagePicker({ image, cutout, status, onImage, onCutoutImage, onR
       }
       const blob = await imageItem.getType(imageType);
       const dataUrl = await resizeDataUrl(await fileToDataUrl(new File([blob], "apple-cutout.png", { type: blob.type || "image/png" })));
-      onCutoutImage(dataUrl);
+      onCutoutImage(dataUrl, "apple-cutout.png");
       setPasteMessage("已粘贴苹果抠图。");
     } catch {
       setPasteMessage("当前浏览器不允许直接读取剪贴板，可以用“上传苹果抠图 PNG”。");
@@ -72,7 +72,7 @@ export function ImagePicker({ image, cutout, status, onImage, onCutoutImage, onR
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
     canvas.getContext("2d")?.drawImage(video, 0, 0);
-    onImage(await resizeDataUrl(canvas.toDataURL("image/jpeg", 0.9)));
+    onImage(await resizeDataUrl(canvas.toDataURL("image/jpeg", 0.9)), "拍摄衣服");
     setCameraOpen(false);
   };
 

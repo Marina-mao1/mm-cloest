@@ -1,4 +1,4 @@
-import { ChevronDown, Filter, Plus, Search } from "lucide-react";
+import { Check, ChevronDown, Filter, Pencil, Plus, Search, Trash2, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { ClothingCard } from "../components/ClothingCard";
 import { CATEGORIES, MAIN_CATEGORIES } from "../constants/wardrobe";
@@ -16,9 +16,11 @@ type Props = {
   onHomeColorsChange: (colors: HomeColorMap) => void;
   homeLocations: string[];
   onAddHomeLocation: (name: string, color: string) => void;
+  onUpdateHomeLocation: (previousName: string, nextName: string, color: string) => void;
+  onDeleteHomeLocation: (name: string) => void;
 };
 
-export function WardrobePage({ clothes, allTags, onEdit, onDelete, onToggleFavorite, onReprocess, onChangeHomeLocation, homeColors, onHomeColorsChange, homeLocations, onAddHomeLocation }: Props) {
+export function WardrobePage({ clothes, allTags, onEdit, onDelete, onToggleFavorite, onReprocess, onChangeHomeLocation, homeColors, onHomeColorsChange, homeLocations, onAddHomeLocation, onUpdateHomeLocation, onDeleteHomeLocation }: Props) {
   const [query, setQuery] = useState("");
   const [main, setMain] = useState<MainCategory | "">("");
   const [sub, setSub] = useState("");
@@ -28,6 +30,8 @@ export function WardrobePage({ clothes, allTags, onEdit, onDelete, onToggleFavor
   const [newHomeName, setNewHomeName] = useState("");
   const [newHomeColor, setNewHomeColor] = useState("#c85c72");
   const [homeMenuOpen, setHomeMenuOpen] = useState(false);
+  const [editingHome, setEditingHome] = useState<string | null>(null);
+  const [editingHomeName, setEditingHomeName] = useState("");
   const [favoriteOnly, setFavoriteOnly] = useState(false);
   const colors = useMemo(() => Array.from(new Set(clothes.map((item) => item.color).filter(Boolean))).sort(), [clothes]);
   const filtered = clothes.filter((item) =>
@@ -45,6 +49,17 @@ export function WardrobePage({ clothes, allTags, onEdit, onDelete, onToggleFavor
     onAddHomeLocation(newHomeName, newHomeColor);
     setNewHomeName("");
     setHomeMenuOpen(false);
+  };
+
+  const startEditHome = (location: string) => {
+    setEditingHome(location);
+    setEditingHomeName(location);
+  };
+
+  const saveHome = (location: string) => {
+    onUpdateHomeLocation(location, editingHomeName, homeColors[location] || "#b9ada7");
+    setEditingHome(null);
+    setEditingHomeName("");
   };
 
   return (
@@ -94,13 +109,35 @@ export function WardrobePage({ clothes, allTags, onEdit, onDelete, onToggleFavor
                 <button className={!homeLocation ? "is-selected" : ""} type="button" onClick={() => { setHomeLocation(""); setHomeMenuOpen(false); }}>所有房子</button>
                 {homeLocations.map((location) => (
                   <div className="home-filter-option" key={location}>
-                    <button className={homeLocation === location ? "is-selected" : ""} type="button" onClick={() => { setHomeLocation(location); setHomeMenuOpen(false); }}>
-                      <i style={{ backgroundColor: homeColors[location] || "#b9ada7" }} />{location}
-                    </button>
+                    {editingHome === location ? (
+                      <input
+                        className="home-edit-input"
+                        value={editingHomeName}
+                        autoFocus
+                        onChange={(event) => setEditingHomeName(event.target.value)}
+                        onKeyDown={(event) => event.key === "Enter" && saveHome(location)}
+                        aria-label="房子名称"
+                      />
+                    ) : (
+                      <button className={homeLocation === location ? "is-selected" : ""} type="button" onClick={() => { setHomeLocation(location); setHomeMenuOpen(false); }}>
+                        <i style={{ backgroundColor: homeColors[location] || "#b9ada7" }} />{location}
+                      </button>
+                    )}
                     <label title={`选择${location}的标记颜色`}>
                       <input type="color" value={homeColors[location] || "#b9ada7"} onChange={(event) => onHomeColorsChange({ ...homeColors, [location]: event.target.value })} />
                       <i style={{ backgroundColor: homeColors[location] || "#b9ada7" }} />
                     </label>
+                    {editingHome === location ? (
+                      <>
+                        <button className="home-action" type="button" title="保存名称" onClick={() => saveHome(location)}><Check size={14} /></button>
+                        <button className="home-action" type="button" title="取消" onClick={() => setEditingHome(null)}><X size={14} /></button>
+                      </>
+                    ) : (
+                      <>
+                        <button className="home-action" type="button" title="修改房子名称" onClick={() => startEditHome(location)}><Pencil size={13} /></button>
+                        <button className="home-action home-delete" type="button" title="删除这个房子" onClick={() => onDeleteHomeLocation(location)}><Trash2 size={13} /></button>
+                      </>
+                    )}
                   </div>
                 ))}
                 <div className="home-filter-add">

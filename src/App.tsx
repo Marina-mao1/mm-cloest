@@ -83,6 +83,40 @@ export default function App() {
     notify(`已添加「${location}」`);
   };
 
+  const updateHomeLocation = (previousName: string, nextName: string, color: string) => {
+    const location = nextName.trim();
+    if (!location) {
+      notify("房子名称不能为空", "delete");
+      return;
+    }
+    if (location !== previousName && availableHomes.includes(location)) {
+      notify("这个房子名称已经存在", "delete");
+      return;
+    }
+    setHomeLocations((current) => current.map((entry) => entry === previousName ? location : entry));
+    setHomeColors((current) => {
+      const next = { ...current, [location]: color };
+      if (location !== previousName) delete next[previousName];
+      return next;
+    });
+    if (location !== previousName) {
+      setClothes((current) => current.map((item) => item.homeLocation === previousName ? { ...item, homeLocation: location, updatedAt: new Date().toISOString() } : item));
+    }
+    notify("房子标记已更新");
+  };
+
+  const deleteHomeLocation = (location: string) => {
+    if (!window.confirm(`删除「${location}」吗？衣服不会删除，只会变成未标注。`)) return;
+    setHomeLocations((current) => current.filter((entry) => entry !== location));
+    setHomeColors((current) => {
+      const next = { ...current };
+      delete next[location];
+      return next;
+    });
+    setClothes((current) => current.map((item) => item.homeLocation === location ? { ...item, homeLocation: "", updatedAt: new Date().toISOString() } : item));
+    notify(`已删除「${location}」`, "delete");
+  };
+
   const saveProfile = (nextProfile: UserProfile) => {
     setProfile(nextProfile);
     notify("你的衣橱设置已保存");
@@ -160,6 +194,8 @@ export default function App() {
           onChangeHomeLocation={changeHomeLocation}
           homeLocations={availableHomes}
           onAddHomeLocation={addHomeLocation}
+          onUpdateHomeLocation={updateHomeLocation}
+          onDeleteHomeLocation={deleteHomeLocation}
         />
       )}
       {page === "add" && (

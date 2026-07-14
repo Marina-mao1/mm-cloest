@@ -29,9 +29,34 @@ const choose = (mainCategory: MainCategory, subCategory: string, confidence: num
   reason
 });
 
-export async function recognizeClothingCategory(originalImage: string, cutoutImage?: string): Promise<ClothingRecognition> {
+const fileNameMatches: Array<{ words: string[]; mainCategory: MainCategory; subCategory: string }> = [
+  { words: ["吊带", "camisole", "cami", "halter"], mainCategory: "上衣", subCategory: "吊带" },
+  { words: ["背心", "vest", "tank"], mainCategory: "上衣", subCategory: "背心" },
+  { words: ["短袖", "tshirt", "t-shirt", "tee"], mainCategory: "上衣", subCategory: "短袖" },
+  { words: ["长袖", "longsleeve", "long-sleeve"], mainCategory: "上衣", subCategory: "长袖" },
+  { words: ["针织", "毛衣", "knit", "sweater", "cardigan"], mainCategory: "上衣", subCategory: "针织衫" },
+  { words: ["衬衫", "shirt", "blouse"], mainCategory: "上衣", subCategory: "衬衫" },
+  { words: ["卫衣", "hoodie", "sweatshirt"], mainCategory: "上衣", subCategory: "卫衣" },
+  { words: ["外套", "夹克", "jacket", "coat"], mainCategory: "上衣", subCategory: "外套" },
+  { words: ["牛仔裤", "jeans", "denim"], mainCategory: "下装", subCategory: "牛仔裤" },
+  { words: ["短裤", "shorts"], mainCategory: "下装", subCategory: "短裤" },
+  { words: ["长裤", "裤子", "trousers", "pants"], mainCategory: "下装", subCategory: "长裤" },
+  { words: ["短裙", "miniskirt"], mainCategory: "下装", subCategory: "短裙" },
+  { words: ["长裙", "半身裙", "skirt"], mainCategory: "下装", subCategory: "长裙" },
+  { words: ["连衣裙", "dress"], mainCategory: "连衣裙", subCategory: "连衣裙" },
+  { words: ["睡衣", "pajama", "pyjama"], mainCategory: "睡衣", subCategory: "睡衣套装" },
+  { words: ["腰带", "belt"], mainCategory: "腰带", subCategory: "腰带" },
+  { words: ["鞋", "sneaker", "boot", "heel", "loafer"], mainCategory: "鞋", subCategory: "鞋" },
+  { words: ["帽", "hat", "cap", "beanie"], mainCategory: "帽子", subCategory: "帽子" },
+  { words: ["包", "bag", "tote", "purse"], mainCategory: "包", subCategory: "包" }
+];
+
+export async function recognizeClothingCategory(originalImage: string, cutoutImage?: string, fileName?: string): Promise<ClothingRecognition> {
+  const normalizedName = fileName?.toLowerCase().replace(/\.[a-z0-9]+$/i, "") || "";
+  const namedMatch = fileNameMatches.find((entry) => entry.words.some((word) => normalizedName.includes(word)));
+  if (namedMatch) return choose(namedMatch.mainCategory, namedMatch.subCategory, 0.92, "根据图片文件名识别");
   const stats = await getMaskStats(cutoutImage || originalImage);
-  if (!stats) return choose("上衣", "短袖", 0.35, "图片主体不够清晰，先按常见上衣处理");
+  if (!stats) return choose("上衣", "短袖", 0.22, "图片主体不够清晰，仅作低参考建议");
 
   if (stats.aspect > 3.1 && stats.coverage < 0.38) {
     return choose("腰带", "腰带", 0.78, "主体又长又窄，像腰带");
@@ -67,7 +92,7 @@ export async function recognizeClothingCategory(originalImage: string, cutoutIma
     return choose("上衣", "长袖", 0.58, "上半身横向较宽，可能有袖子");
   }
 
-  return choose("上衣", "短袖", 0.52, "主体轮廓接近常见上衣");
+  return choose("上衣", "短袖", 0.38, "轮廓信息有限，仅作低参考建议");
 }
 
 async function getMaskStats(imageDataUrl: string): Promise<MaskStats | null> {

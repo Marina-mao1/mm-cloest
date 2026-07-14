@@ -58,7 +58,7 @@ export function AddClothingPage({ clothesCount, editing, allTags, homeLocations,
     setRecognition(null);
   }, [editing]);
 
-  const processImage = async (image: string) => {
+  const processImage = async (image: string, fileName?: string) => {
     setImageStatus("processing");
     setCutoutImage(undefined);
     setRecognition(null);
@@ -66,46 +66,31 @@ export function AddClothingPage({ clothesCount, editing, allTags, homeLocations,
       const cutout = await backgroundRemovalService.removeBackground(image);
       setCutoutImage(cutout);
       setImageStatus("cutout");
-      const result = await recognizeClothingCategory(image, cutout);
+      const result = await recognizeClothingCategory(image, cutout, fileName);
       setRecognition(result);
-      setForm((current) => ({
-        ...current,
-        mainCategory: result.mainCategory,
-        subCategory: result.subCategory
-      }));
     } catch {
       setImageStatus("failed");
       try {
-        const result = await recognizeClothingCategory(image);
+        const result = await recognizeClothingCategory(image, undefined, fileName);
         setRecognition(result);
-        setForm((current) => ({
-          ...current,
-          mainCategory: result.mainCategory,
-          subCategory: result.subCategory
-        }));
       } catch {
         setRecognition(null);
       }
     }
   };
 
-  const setImage = (image: string) => {
+  const setImage = (image: string, fileName?: string) => {
     setOriginalImage(image);
-    void processImage(image);
+    void processImage(image, fileName);
   };
 
-  const setPreparedCutout = async (image: string) => {
+  const setPreparedCutout = async (image: string, fileName?: string) => {
     setOriginalImage(image);
     setCutoutImage(image);
     setImageStatus("cutout");
     try {
-      const result = await recognizeClothingCategory(image, image);
+      const result = await recognizeClothingCategory(image, image, fileName);
       setRecognition(result);
-      setForm((current) => ({
-        ...current,
-        mainCategory: result.mainCategory,
-        subCategory: result.subCategory
-      }));
     } catch {
       setRecognition(null);
     }
@@ -218,9 +203,12 @@ export function AddClothingPage({ clothesCount, editing, allTags, homeLocations,
           </div>
           {recognition && (
             <div className="rounded-[22px] bg-[#f7efff]/80 px-4 py-3 text-sm text-[#765a86]">
-              <div className="font-semibold text-[#8b63bd]">已自动识别：{recognition.mainCategory} · {recognition.subCategory}</div>
+              <div className="flex items-center justify-between gap-3">
+                <div className="font-semibold text-[#8b63bd]">识别建议：{recognition.mainCategory} · {recognition.subCategory}</div>
+                <button type="button" className="text-xs font-semibold text-[#8b63bd] underline underline-offset-2" onClick={() => setForm((current) => ({ ...current, mainCategory: recognition.mainCategory, subCategory: recognition.subCategory }))}>采用建议</button>
+              </div>
               <div className="mt-1 text-xs leading-relaxed text-[#9a8199]">
-                {recognition.reason}，置信度 {Math.round(recognition.confidence * 100)}%。不准的话可以手动改。
+                {recognition.reason}，参考度 {Math.round(recognition.confidence * 100)}%。类别不会自动覆盖，你可以采用建议，或直接在上方手动选择。
               </div>
             </div>
           )}
