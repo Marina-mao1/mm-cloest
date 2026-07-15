@@ -57,7 +57,7 @@ export function HomePage({ clothes, outfits, weeklyPlan, profile, onNavigate }: 
       <section className="home-hero">
         <div className="home-hero-photo" />
         <div className="home-hero-copy">
-          <p className="home-stamp">THE CLOSET DIARY / 04:26 PM</p>
+          <p className="home-stamp">THE CLOSET DIARY</p>
           <h1>Hi, {profile.name || "there"}</h1>
           <p>你的衣橱，正安静地等你决定今天的样子。</p>
           <button className="home-link" onClick={() => onNavigate("wardrobe")}>看看我的衣服 <ArrowUpRight size={16} /></button>
