@@ -3,7 +3,6 @@ import { useEffect, useMemo, useState } from "react";
 import { CATEGORIES, DEFAULT_TAGS, MAIN_CATEGORIES } from "../constants/wardrobe";
 import { ImagePicker } from "../components/ImagePicker";
 import { backgroundRemovalService } from "../services/backgroundRemoval";
-import { recognizeClothingCategory, type ClothingRecognition } from "../services/clothingRecognition";
 import type { ClothingItem, ImageStatus, MainCategory } from "../types";
 import { createId } from "../utils/id";
 import { rotateDataUrl } from "../utils/image";
@@ -50,7 +49,6 @@ export function AddClothingPage({ clothesCount, editing, allTags, homeLocations,
   const [tagsOpen, setTagsOpen] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [recognition, setRecognition] = useState<ClothingRecognition | null>(null);
   const tagOptions = useMemo(() => Array.from(new Set([...DEFAULT_TAGS, ...allTags])), [allTags]);
 
   useEffect(() => {
@@ -68,45 +66,29 @@ export function AddClothingPage({ clothesCount, editing, allTags, homeLocations,
     setOriginalImage(editing.originalImage);
     setCutoutImage(editing.cutoutImage);
     setImageStatus(editing.imageStatus);
-    setRecognition(null);
   }, [editing]);
 
-  const processImage = async (image: string, fileName?: string) => {
+  const processImage = async (image: string) => {
     setImageStatus("processing");
     setCutoutImage(undefined);
-    setRecognition(null);
     try {
       const cutout = await backgroundRemovalService.removeBackground(image);
       setCutoutImage(cutout);
       setImageStatus("cutout");
-      const result = await recognizeClothingCategory(image, cutout, fileName);
-      setRecognition(result);
     } catch {
       setImageStatus("failed");
-      try {
-        const result = await recognizeClothingCategory(image, undefined, fileName);
-        setRecognition(result);
-      } catch {
-        setRecognition(null);
-      }
     }
   };
 
-  const setImage = (image: string, fileName?: string) => {
+  const setImage = (image: string) => {
     setOriginalImage(image);
-    void processImage(image, fileName);
+    void processImage(image);
   };
 
-  const setPreparedCutout = async (image: string, fileName?: string) => {
+  const setPreparedCutout = async (image: string) => {
     setOriginalImage(image);
     setCutoutImage(image);
     setImageStatus("cutout");
-    try {
-      const result = await recognizeClothingCategory(image, image, fileName);
-      setRecognition(result);
-    } catch {
-      setRecognition(null);
-    }
   };
 
   const rotateImage = async (degrees: 90 | -90) => {
@@ -147,7 +129,6 @@ export function AddClothingPage({ clothesCount, editing, allTags, homeLocations,
     setOriginalImage("");
     setCutoutImage(undefined);
     setImageStatus("original");
-    setRecognition(null);
   };
 
   const selectBatchMain = (mainCategory: MainCategory) => {
@@ -260,17 +241,6 @@ export function AddClothingPage({ clothesCount, editing, allTags, homeLocations,
               ))}
             </div> : <p className="mt-2 text-xs leading-5 text-[#927d74]">还没有添加房子。可以先保存，再到衣橱的“所有房子”里添加。</p>}
           </div>
-          {recognition && (
-            <div className="rounded-[22px] bg-[#f7efff]/80 px-4 py-3 text-sm text-[#765a86]">
-              <div className="flex items-center justify-between gap-3">
-                <div className="font-semibold text-[#8b63bd]">识别建议：{recognition.mainCategory} · {recognition.subCategory}</div>
-                <button type="button" className="text-xs font-semibold text-[#8b63bd] underline underline-offset-2" onClick={() => setForm((current) => ({ ...current, mainCategory: recognition.mainCategory, subCategory: recognition.subCategory }))}>采用建议</button>
-              </div>
-              <div className="mt-1 text-xs leading-relaxed text-[#9a8199]">
-                {recognition.reason}，参考度 {Math.round(recognition.confidence * 100)}%。类别不会自动覆盖，你可以采用建议，或直接在上方手动选择。
-              </div>
-            </div>
-          )}
           <label className="field-label">颜色<input className="input" value={form.color} onChange={(event) => setForm({ ...form, color: event.target.value })} placeholder="奶白、深蓝、卡其" /></label>
           <div className="compact-disclosure">
             <button type="button" className="compact-disclosure-trigger" onClick={() => setTagsOpen((current) => !current)} aria-expanded={tagsOpen}>
