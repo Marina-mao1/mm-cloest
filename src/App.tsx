@@ -18,7 +18,7 @@ import type { ClothingItem, HomeColorMap, HomeLocation, Outfit, OutfitScene, Pag
 const emptyProfile: UserProfile = { name: "", gymDays: [], gymTime: "", setupComplete: false };
 
 export default function App() {
-  const { clothes, setClothes, outfits, setOutfits, weeklyPlan, setWeeklyPlan, allTags, markUsed } = useWardrobeStore();
+  const { clothes, clothesReady, setClothes, outfits, setOutfits, weeklyPlan, setWeeklyPlan, allTags, markUsed } = useWardrobeStore();
   const [homeLocations, setHomeLocations] = useLocalStorage<HomeLocation[]>("wardrobe.homeLocations.v1", []);
   const [homeColors, setHomeColors] = useLocalStorage<HomeColorMap>("wardrobe.homeColors.v1", {});
   const [profile, setProfile] = useLocalStorage<UserProfile>("wardrobe.profile.v1", emptyProfile);
@@ -178,6 +178,9 @@ export default function App() {
     <>
     <div className={`main-stage ${entranceState === "transitioning" ? "is-revealing" : ""} ${entranceState === "complete" ? "is-ready" : ""}`}>
     <AppShell page={page} ownerName={profile.name} onNavigate={navigate}>
+      {!clothesReady ? (
+        <div className="flex min-h-[50vh] items-center justify-center px-8 text-center text-sm text-[#8a7488]">正在打开你的衣橱，请稍等一下。</div>
+      ) : <>
       {page === "home" && (
         <HomePage clothes={clothes} outfits={outfits} weeklyPlan={weeklyPlan} profile={profile} onNavigate={navigate} />
       )}
@@ -228,6 +231,7 @@ export default function App() {
       )}
       {page === "planner" && <PlannerPage outfits={outfits} weeklyPlan={weeklyPlan} profile={profile} onAssign={assignDay} />}
       {page === "profile" && <ProfilePage profile={profile} onSave={saveProfile} />}
+      </>}
     </AppShell>
     </div>
     {entranceState !== "complete" && (
