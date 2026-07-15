@@ -113,6 +113,9 @@
   .home-location-dot:active { transform: scale(0.86); box-shadow: 0 0 0 2px #d9b8c1; }
   .batch-picker { margin-top: 12px; border: 1px solid #e4cfd1; border-radius: 4px; background: linear-gradient(135deg, #fff9f6, #f9edf1); padding: 15px; box-shadow: 0 8px 16px rgb(104 60 70 / 0.08); }
   .batch-end { display: inline-flex; flex: 0 0 auto; align-items: center; gap: 4px; border: 0; background: transparent; color: #9a6973; font-size: 12px; text-decoration: underline; text-underline-offset: 3px; }
+  .compact-disclosure { border-top: 1px solid #eadfd5; padding-top: 3px; }
+  .compact-disclosure-trigger { display: flex; width: 100%; align-items: center; justify-content: space-between; border: 0; background: transparent; padding: 10px 1px 7px; color: #594641; font-size: 14px; text-align: left; }
+  .compact-disclosure-trigger span { display: inline-flex; align-items: center; gap: 7px; }
   .soft-shell, .cute-panel { @apply rounded-[4px] border border-[#ddcfc3] bg-[#fffdf8] shadow-[0_8px_16px_rgba(74,48,40,0.08)]; }
   .scrapbook-bg { background: #f5efe5; }
   .power-pop { @apply border border-[#ddcfc3] shadow-[0_6px_13px_rgba(74,48,40,0.07)]; }

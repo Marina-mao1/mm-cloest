@@ -1,4 +1,4 @@
-import { Layers3, Save, Star, X } from "lucide-react";
+import { ChevronDown, Layers3, Save, Star, Tag, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { CATEGORIES, DEFAULT_TAGS, MAIN_CATEGORIES } from "../constants/wardrobe";
 import { ImagePicker } from "../components/ImagePicker";
@@ -47,6 +47,8 @@ export function AddClothingPage({ clothesCount, editing, allTags, homeLocations,
   const [batchMode, setBatchMode] = useState(false);
   const [batchPickerOpen, setBatchPickerOpen] = useState(false);
   const [batchPreset, setBatchPreset] = useState<BatchPreset>(null);
+  const [tagsOpen, setTagsOpen] = useState(false);
+  const [noteOpen, setNoteOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [recognition, setRecognition] = useState<ClothingRecognition | null>(null);
   const tagOptions = useMemo(() => Array.from(new Set([...DEFAULT_TAGS, ...allTags])), [allTags]);
@@ -245,7 +247,6 @@ export function AddClothingPage({ clothesCount, editing, allTags, homeLocations,
       </section>
       <aside className="cute-panel p-5">
         <div className="space-y-4">
-          <label className="field-label">名称<input className="input" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} placeholder="白色短袖、灰色运动裤" /></label>
           <div className="grid grid-cols-2 gap-3">
             <label className="field-label">大类<select className="input" value={form.mainCategory} onChange={(event) => setMainCategory(event.target.value as MainCategory)}>{MAIN_CATEGORIES.map((item) => <option key={item}>{item}</option>)}</select></label>
             <label className="field-label">子分类<select className="input" value={form.subCategory} onChange={(event) => setForm({ ...form, subCategory: event.target.value })}>{CATEGORIES[form.mainCategory].map((item) => <option key={item}>{item}</option>)}</select></label>
@@ -271,20 +272,31 @@ export function AddClothingPage({ clothesCount, editing, allTags, homeLocations,
             </div>
           )}
           <label className="field-label">颜色<input className="input" value={form.color} onChange={(event) => setForm({ ...form, color: event.target.value })} placeholder="奶白、深蓝、卡其" /></label>
-          <div>
-            <span className="field-label">标签</span>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {tagOptions.map((tag) => (
-                <button key={tag} type="button" onClick={() => toggleTag(tag)} className={`tag ${form.tags.includes(tag) ? "tag-active" : ""}`}>{tag}</button>
-              ))}
-            </div>
-            <div className="mt-3 flex gap-2">
-              <input className="input" value={customTag} onChange={(event) => setCustomTag(event.target.value)} onKeyDown={(event) => event.key === "Enter" && (event.preventDefault(), addCustomTag())} placeholder="自定义标签" />
-              <button className="btn-secondary" type="button" onClick={addCustomTag}>添加</button>
-            </div>
+          <div className="compact-disclosure">
+            <button type="button" className="compact-disclosure-trigger" onClick={() => setTagsOpen((current) => !current)} aria-expanded={tagsOpen}>
+              <span><Tag size={16} />标签{form.tags.length ? ` · 已选 ${form.tags.length}` : ""}</span>
+              <ChevronDown size={17} className={tagsOpen ? "rotate-180" : ""} />
+            </button>
+            {tagsOpen && <div className="mt-3">
+              <div className="flex flex-wrap gap-2">
+                {tagOptions.map((tag) => (
+                  <button key={tag} type="button" onClick={() => toggleTag(tag)} className={`tag ${form.tags.includes(tag) ? "tag-active" : ""}`}>{tag}</button>
+                ))}
+              </div>
+              <div className="mt-3 flex gap-2">
+                <input className="input" value={customTag} onChange={(event) => setCustomTag(event.target.value)} onKeyDown={(event) => event.key === "Enter" && (event.preventDefault(), addCustomTag())} placeholder="自定义标签" />
+                <button className="btn-secondary" type="button" onClick={addCustomTag}>添加</button>
+              </div>
+            </div>}
           </div>
           <label className="flex items-center gap-2 rounded-2xl bg-paper px-3 py-2 text-sm text-[#725d72]"><input type="checkbox" checked={form.favorite} onChange={(event) => setForm({ ...form, favorite: event.target.checked })} /><Star size={16} />收藏</label>
-          <label className="field-label">备注<textarea className="input min-h-24 resize-none" value={form.note} onChange={(event) => setForm({ ...form, note: event.target.value })} placeholder="版型、搭配灵感、洗护提醒" /></label>
+          <div className="compact-disclosure">
+            <button type="button" className="compact-disclosure-trigger" onClick={() => setNoteOpen((current) => !current)} aria-expanded={noteOpen}>
+              <span>备注{form.note ? " · 已填写" : ""}</span>
+              <ChevronDown size={17} className={noteOpen ? "rotate-180" : ""} />
+            </button>
+            {noteOpen && <textarea className="input mt-3 min-h-24 resize-none" value={form.note} onChange={(event) => setForm({ ...form, note: event.target.value })} placeholder="版型、搭配灵感、洗护提醒" />}
+          </div>
           <div className="flex gap-2">
             <button className="btn-primary flex-1 justify-center" onClick={() => void save()} disabled={!originalImage || saving}><Save size={17} />{saving ? "正在保存..." : "保存"}</button>
             {editing && <button className="btn-secondary" onClick={onCancelEdit}>取消</button>}

@@ -88,12 +88,12 @@ export function ImagePicker({ image, cutout, status, onImage, onCutoutImage, onR
 
   return (
     <div className="cute-panel p-4">
-      <div className="grid gap-4 md:grid-cols-2">
-        <div className="aspect-[4/5] overflow-hidden rounded-[22px] bg-gradient-to-br from-paper via-white to-skywash/45">
-          {image ? <img src={image} alt="原图" className="h-full w-full object-contain p-3" /> : <div className="flex h-full items-center justify-center text-[#aa93ad]">原图</div>}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="aspect-[6/5] overflow-hidden rounded-[16px] bg-gradient-to-br from-paper via-white to-skywash/45">
+          {image ? <img src={image} alt="原图" className="h-full w-full object-contain p-2" /> : <div className="flex h-full items-center justify-center text-sm text-[#aa93ad]">原图</div>}
         </div>
-        <div className="aspect-[4/5] overflow-hidden rounded-[22px] bg-[linear-gradient(45deg,#f5edf7_25%,transparent_25%),linear-gradient(-45deg,#f5edf7_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#f5edf7_75%),linear-gradient(-45deg,transparent_75%,#f5edf7_75%)] bg-[length:24px_24px] bg-[position:0_0,0_12px,12px_-12px,-12px_0]">
-          {cutout ? <img src={cutout} alt="抠图" className="h-full w-full object-contain p-3" /> : <div className="flex h-full items-center justify-center bg-white/35 text-[#aa93ad]">{status === "processing" ? "正在自动抠图" : "透明 PNG"}</div>}
+        <div className="aspect-[6/5] overflow-hidden rounded-[16px] bg-[linear-gradient(45deg,#f5edf7_25%,transparent_25%),linear-gradient(-45deg,#f5edf7_25%,transparent_25%),linear-gradient(45deg,transparent_75%,#f5edf7_75%),linear-gradient(-45deg,transparent_75%,#f5edf7_75%)] bg-[length:18px_18px] bg-[position:0_0,0_9px,9px_-9px,-9px_0]">
+          {cutout ? <img src={cutout} alt="抠图" className="h-full w-full object-contain p-2" /> : <div className="flex h-full items-center justify-center bg-white/35 px-2 text-center text-sm text-[#aa93ad]">{status === "processing" ? "正在自动抠图" : "透明 PNG"}</div>}
         </div>
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
